@@ -337,3 +337,360 @@ Ref: https://github.com/kubeflow/examples/issues/828
 AttributeError: module 'tornado.ioloop' has no attribute '_Selectable'
 ```
 Try to use this version `tornado>=6.0.3`
+
+
+
+---
+# Deploy Kubeflow on local via minikube
+## Pass the kfctl apply stage and successfully access the dashboard!
+**Create a cluster via VM!**
+```
+~ ›› minikube start --kubernetes-version v1.15.12                                                                                                                                     
+😄  minikube v1.14.1 on Ubuntu 18.04
+✨  Automatically selected the docker driver
+👍  Starting control plane node minikube in cluster minikube
+🔥  Creating docker container (CPUs=2, Memory=8000MB) ...
+✋  Stopping node "minikube"  ...
+🛑  Powering off "minikube" via SSH ...
+🔥  Deleting "minikube" in docker ...
+🤦  StartHost failed, but will try again: creating host: create: provisioning: ssh command error:
+command : sudo hostname minikube && echo "minikube" | sudo tee /etc/hostname
+err     : Process exited with status 1
+output  : sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the 'nosuid' option set or an NFS file system without root privileges?
+
+🔥  Creating docker container (CPUs=2, Memory=8000MB) ...
+😿  Failed to start docker container. Running "minikube delete" may fix it: creating host: create: provisioning: ssh command error:
+command : sudo hostname minikube && echo "minikube" | sudo tee /etc/hostname
+err     : Process exited with status 1
+output  : sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the 'nosuid' option set or an NFS file system without root privileges?
+
+❗  Startup with docker driver failed, trying with alternate driver virtualbox: Failed to start host: creating host: create: provisioning: ssh command error:
+command : sudo hostname minikube && echo "minikube" | sudo tee /etc/hostname
+err     : Process exited with status 1
+output  : sudo: effective uid is not 0, is /usr/bin/sudo on a file system with the 'nosuid' option set or an NFS file system without root privileges?
+
+🔥  Deleting "minikube" in docker ...
+🔥  Deleting container "minikube" ...
+🔥  Removing /home/chieh/.minikube/machines/minikube ...
+💀  Removed all traces of the "minikube" cluster.
+💿  Downloading VM boot image ...
+    > minikube-v1.14.0.iso.sha256: 65 B / 65 B [-------------] 100.00% ? p/s 0s
+    > minikube-v1.14.0.iso: 178.27 MiB / 178.27 MiB [ 100.00% 11.02 MiB p/s 17s
+👍  Starting control plane node minikube in cluster minikube
+🔥  Creating virtualbox VM (CPUs=2, Memory=6000MB, Disk=20000MB) ...
+🐳  Preparing Kubernetes v1.15.12 on Docker 19.03.12 ...
+🔎  Verifying Kubernetes components...
+🌟  Enabled addons: storage-provisioner, default-storageclass
+🏄  Done! kubectl is now configured to use "minikube" by default
+
+```
+
+**Use kfctl v1.0**
+```
+wget https://github.com/kubeflow/kfctl/releases/download/v1.0-rc.1/kfctl_v1.0-rc.1-0-g963c787_linux.tar.gz
+```
+
+**Use kfctl_k8s_istio.0.7.1.yaml**
+```
+kf_test10 ›› export CONFIG_URI="https://raw.githubusercontent.com/kubeflow/manifests/v0.7-branch/kfdef/kfctl_k8s_istio.0.7.1.yaml"            
+```
+
+**kfctl apply**
+```                                        
+kf_test10 ›› kfctl apply -V -f ${CONFIG_URI}                                                                                                                                          
+INFO[0000] Downloading https://raw.githubusercontent.com/kubeflow/manifests/v0.7-branch/kfdef/kfctl_k8s_istio.0.7.1.yaml to /tmp/704589051/tmp.yaml  filename="utils/k8utils.go:172"
+INFO[0000] Downloading https://raw.githubusercontent.com/kubeflow/manifests/v0.7-branch/kfdef/kfctl_k8s_istio.0.7.1.yaml to /tmp/693838366/tmp_app.yaml  filename="loaders/loaders.go:71"
+INFO[0001] App directory /home/chieh/kubeflow_use/kf_test10 already exists  filename="coordinator/coordinator.go:270"
+INFO[0001] Writing KfDef to kfctl_k8s_istio.0.7.1.yaml   filename="coordinator/coordinator.go:273"
+INFO[0001] No name specified in KfDef.Metadata.Name; defaulting to kf_test10 based on location of config file: /home/chieh/kubeflow_use/kf_test10/kfctl_k8s_istio.0.7.1.yaml.  filename="coordinator/coordinator.go:202"
+INFO[0001] 
+****************************************************************
+Notice anonymous usage reporting enabled using spartakus
+To disable it
+If you have already deployed it run the following commands:
+  cd $(pwd)
+  kubectl -n ${K8S_NAMESPACE} delete deploy -l app=spartakus
+
+For more info: https://www.kubeflow.org/docs/other-guides/usage-reporting/
+****************************************************************
+
+(PASS)
+
+serviceaccount/ml-pipeline-scheduledworkflow created
+role.rbac.authorization.k8s.io/ml-pipeline-scheduledworkflow created
+clusterrole.rbac.authorization.k8s.io/kubeflow-scheduledworkflows-admin created
+clusterrole.rbac.authorization.k8s.io/kubeflow-scheduledworkflows-edit created
+clusterrole.rbac.authorization.k8s.io/kubeflow-scheduledworkflows-view created
+clusterrolebinding.rbac.authorization.k8s.io/ml-pipeline-scheduledworkflow created
+deployment.apps/ml-pipeline-scheduledworkflow created
+application.app.k8s.io/scheduledworkflow created
+service/ml-pipeline-ml-pipeline-visualizationserver created
+deployment.apps/ml-pipeline-ml-pipeline-visualizationserver created
+application.app.k8s.io/pipeline-visualization-service created
+customresourcedefinition.apiextensions.k8s.io/profiles.kubeflow.org created
+serviceaccount/profiles-controller-service-account created
+clusterrolebinding.rbac.authorization.k8s.io/profiles-cluster-role-binding created
+configmap/profiles-profiles-parameters-5c86m8kfb8 created
+service/profiles-kfam created
+deployment.apps/profiles-deployment created
+application.app.k8s.io/profiles created
+virtualservice.networking.istio.io/kfam created
+customresourcedefinition.apiextensions.k8s.io/seldondeployments.machinelearning.seldon.io created
+serviceaccount/seldon-manager created
+clusterrole.rbac.authorization.k8s.io/seldon-operator-manager-role created
+clusterrolebinding.rbac.authorization.k8s.io/seldon-operator-manager-rolebinding created
+configmap/seldon-config created
+secret/seldon-operator-webhook-server-secret created
+service/seldon-operator-controller-manager-service created
+service/webhook-server-service created
+statefulset.apps/seldon-operator-controller-manager created
+application.app.k8s.io/seldon-core-operator created
+INFO[0033] Applied the configuration Successfully!       filename="cmd/apply.go:72"
+```
+
+
+```
+kf_test10 ›› kubectl -n kubeflow get all                                                                                                                                              
+
+
+NAME                                                               READY   STATUS              RESTARTS   AGE
+pod/admission-webhook-bootstrap-stateful-set-0                     0/1     ContainerCreating   0          28s
+pod/admission-webhook-deployment-b7d89f4c7-wrq6f                   0/1     ContainerCreating   0          17s
+pod/application-controller-stateful-set-0                          0/1     ContainerCreating   0          31s
+pod/argo-ui-6754c76f9b-8kkwx                                       0/1     ContainerCreating   0          29s
+pod/centraldashboard-5578cc9569-lhlzt                              0/1     ContainerCreating   0          28s
+pod/jupyter-web-app-deployment-6b7d9c5fd6-wzx27                    0/1     ContainerCreating   0          25s
+pod/katib-controller-789d76d446-nn4ll                              0/1     ContainerCreating   0          10s
+pod/katib-db-75975d8dbd-w8r2g                                      0/1     ContainerCreating   0          10s
+pod/katib-manager-59bb84948f-5dmb5                                 0/1     ContainerCreating   0          10s
+pod/katib-ui-dd75bd446-pdjt8                                       0/1     ContainerCreating   0          10s
+pod/kfserving-controller-manager-0                                 0/2     ContainerCreating   0          15s
+pod/metacontroller-0                                               0/1     ContainerCreating   0          29s
+pod/metadata-db-7584d44b65-dztxc                                   0/1     ContainerCreating   0          25s
+pod/metadata-deployment-cd8f7d58f-jzltz                            0/1     ContainerCreating   0          25s
+pod/metadata-envoy-deployment-bff4f8b9-gs762                       0/1     ContainerCreating   0          25s
+pod/metadata-grpc-deployment-7cc5d84854-vq59p                      0/1     ContainerCreating   0          24s
+pod/metadata-ui-7c978889b5-tbk4x                                   0/1     ContainerCreating   0          23s
+pod/minio-764648495-kvczk                                          0/1     ContainerCreating   0          9s
+pod/ml-pipeline-588b64fff-xs2rx                                    0/1     ContainerCreating   0          9s
+pod/ml-pipeline-ml-pipeline-visualizationserver-6c7c97869d-546pr   0/1     Pending             0          6s
+pod/ml-pipeline-persistenceagent-79ff896578-9bvns                  0/1     ContainerCreating   0          9s
+pod/ml-pipeline-scheduledworkflow-7d89bb6db5-xx24f                 0/1     ContainerCreating   0          6s
+pod/ml-pipeline-ui-6656886579-p8tc5                                0/1     ContainerCreating   0          8s
+pod/ml-pipeline-viewer-controller-deployment-546bd5f545-9r8r6      0/1     ContainerCreating   0          7s
+pod/mysql-6c9cb88c4d-5h25j                                         0/1     ContainerCreating   0          9s
+pod/notebook-controller-deployment-6d594ddd6b-xrgwq                0/1     ContainerCreating   0          23s
+pod/profiles-deployment-67799585bd-wwmpg                           0/2     Pending             0          5s
+pod/pytorch-operator-fdfd7985-t9824                                0/1     ContainerCreating   0          23s
+pod/seldon-operator-controller-manager-0                           0/1     ContainerCreating   0          7s
+pod/spartakus-volunteer-5888bc655-w2f66                            0/1     ContainerCreating   0          14s
+pod/tensorboard-5f685f9d79-clk4g                                   0/1     Pending             0          14s
+pod/tf-job-operator-5dff84b966-xbn6n                               0/1     ContainerCreating   0          13s
+pod/workflow-controller-85c665bcb9-q6vt5                           0/1     ContainerCreating   0          29s
+
+
+NAME                                                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+service/admission-webhook-service                      ClusterIP   10.107.160.105   <none>        443/TCP             27s
+service/application-controller-service                 ClusterIP   10.102.97.247    <none>        443/TCP             31s
+service/argo-ui                                        NodePort    10.110.120.111   <none>        80:30796/TCP        29s
+service/centraldashboard                               ClusterIP   10.105.149.236   <none>        80/TCP              28s
+service/jupyter-web-app-service                        ClusterIP   10.109.145.77    <none>        80/TCP              26s
+service/katib-controller                               ClusterIP   10.110.26.202    <none>        443/TCP             13s
+service/katib-db                                       ClusterIP   10.100.193.26    <none>        3306/TCP            13s
+service/katib-manager                                  ClusterIP   10.98.54.159     <none>        6789/TCP            12s
+service/katib-ui                                       ClusterIP   10.110.72.234    <none>        80/TCP              12s
+service/kfserving-controller-manager-metrics-service   ClusterIP   10.111.64.89     <none>        8443/TCP            17s
+service/kfserving-controller-manager-service           ClusterIP   10.99.252.103    <none>        443/TCP             17s
+service/metadata-db                                    ClusterIP   10.98.29.178     <none>        3306/TCP            26s
+service/metadata-envoy-service                         ClusterIP   10.98.237.56     <none>        9090/TCP            26s
+service/metadata-grpc-service                          ClusterIP   10.107.22.226    <none>        8080/TCP            26s
+service/metadata-service                               ClusterIP   10.99.86.171     <none>        8080/TCP            26s
+service/metadata-ui                                    ClusterIP   10.101.0.164     <none>        80/TCP              26s
+service/minio-service                                  ClusterIP   10.99.107.7      <none>        9000/TCP            12s
+service/ml-pipeline                                    ClusterIP   10.97.4.244      <none>        8888/TCP,8887/TCP   12s
+service/ml-pipeline-ml-pipeline-visualizationserver    ClusterIP   10.104.126.110   <none>        8888/TCP            11s
+service/ml-pipeline-tensorboard-ui                     ClusterIP   10.104.147.57    <none>        80/TCP              11s
+service/ml-pipeline-ui                                 ClusterIP   10.102.121.82    <none>        80/TCP              11s
+service/mysql                                          ClusterIP   10.100.43.123    <none>        3306/TCP            12s
+service/notebook-controller-service                    ClusterIP   10.106.253.18    <none>        443/TCP             25s
+service/profiles-kfam                                  ClusterIP   10.109.26.167    <none>        8081/TCP            10s
+service/pytorch-operator                               ClusterIP   10.98.135.92     <none>        8443/TCP            24s
+service/seldon-operator-controller-manager-service     ClusterIP   10.100.72.170    <none>        443/TCP             9s
+service/tensorboard                                    ClusterIP   10.108.124.154   <none>        9000/TCP            16s
+service/tf-job-operator                                ClusterIP   10.99.198.120    <none>        8443/TCP            15s
+service/webhook-server-service                         ClusterIP   10.109.85.218    <none>        443/TCP             9s
+
+
+NAME                                                          READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/admission-webhook-deployment                  0/1     1            0           27s
+deployment.apps/argo-ui                                       0/1     1            0           29s
+deployment.apps/centraldashboard                              0/1     1            0           28s
+deployment.apps/jupyter-web-app-deployment                    0/1     1            0           26s
+deployment.apps/katib-controller                              0/1     1            0           12s
+deployment.apps/katib-db                                      0/1     1            0           12s
+deployment.apps/katib-manager                                 0/1     1            0           12s
+deployment.apps/katib-ui                                      0/1     1            0           12s
+deployment.apps/metadata-db                                   0/1     1            0           26s
+deployment.apps/metadata-deployment                           0/1     1            0           26s
+deployment.apps/metadata-envoy-deployment                     0/1     1            0           26s
+deployment.apps/metadata-grpc-deployment                      0/1     1            0           26s
+deployment.apps/metadata-ui                                   0/1     1            0           26s
+deployment.apps/minio                                         0/1     1            0           12s
+deployment.apps/ml-pipeline                                   0/1     1            0           12s
+deployment.apps/ml-pipeline-ml-pipeline-visualizationserver   0/1     1            0           11s
+deployment.apps/ml-pipeline-persistenceagent                  0/1     1            0           12s
+deployment.apps/ml-pipeline-scheduledworkflow                 0/1     1            0           11s
+deployment.apps/ml-pipeline-ui                                0/1     1            0           11s
+deployment.apps/ml-pipeline-viewer-controller-deployment      0/1     1            0           11s
+deployment.apps/mysql                                         0/1     1            0           12s
+deployment.apps/notebook-controller-deployment                0/1     1            0           25s
+deployment.apps/profiles-deployment                           0/1     1            0           10s
+deployment.apps/pytorch-operator                              0/1     1            0           24s
+deployment.apps/spartakus-volunteer                           0/1     1            0           16s
+deployment.apps/tensorboard                                   0/1     1            0           16s
+deployment.apps/tf-job-operator                               0/1     1            0           15s
+deployment.apps/workflow-controller                           0/1     1            0           29s
+
+NAME                                                                     DESIRED   CURRENT   READY   AGE
+replicaset.apps/admission-webhook-deployment-b7d89f4c7                   1         1         0       27s
+replicaset.apps/argo-ui-6754c76f9b                                       1         1         0       29s
+replicaset.apps/centraldashboard-5578cc9569                              1         1         0       28s
+replicaset.apps/jupyter-web-app-deployment-6b7d9c5fd6                    1         1         0       26s
+replicaset.apps/katib-controller-789d76d446                              1         1         0       12s
+replicaset.apps/katib-db-75975d8dbd                                      1         1         0       12s
+replicaset.apps/katib-manager-59bb84948f                                 1         1         0       12s
+replicaset.apps/katib-ui-dd75bd446                                       1         1         0       12s
+replicaset.apps/metadata-db-7584d44b65                                   1         1         0       26s
+replicaset.apps/metadata-deployment-cd8f7d58f                            1         1         0       26s
+replicaset.apps/metadata-envoy-deployment-bff4f8b9                       1         1         0       26s
+replicaset.apps/metadata-grpc-deployment-7cc5d84854                      1         1         0       26s
+replicaset.apps/metadata-ui-7c978889b5                                   1         1         0       26s
+replicaset.apps/minio-764648495                                          1         1         0       12s
+replicaset.apps/ml-pipeline-588b64fff                                    1         1         0       12s
+replicaset.apps/ml-pipeline-ml-pipeline-visualizationserver-6c7c97869d   1         1         0       11s
+replicaset.apps/ml-pipeline-persistenceagent-79ff896578                  1         1         0       12s
+replicaset.apps/ml-pipeline-scheduledworkflow-7d89bb6db5                 1         1         0       11s
+replicaset.apps/ml-pipeline-ui-6656886579                                1         1         0       11s
+replicaset.apps/ml-pipeline-viewer-controller-deployment-546bd5f545      1         1         0       11s
+replicaset.apps/mysql-6c9cb88c4d                                         1         1         0       12s
+replicaset.apps/notebook-controller-deployment-6d594ddd6b                1         1         0       25s
+replicaset.apps/profiles-deployment-67799585bd                           1         1         0       10s
+replicaset.apps/pytorch-operator-fdfd7985                                1         1         0       24s
+replicaset.apps/spartakus-volunteer-5888bc655                            1         1         0       16s
+replicaset.apps/tensorboard-5f685f9d79                                   1         1         0       16s
+replicaset.apps/tf-job-operator-5dff84b966                               1         1         0       15s
+replicaset.apps/workflow-controller-85c665bcb9                           1         1         0       29s
+
+NAME                                                        READY   AGE
+statefulset.apps/admission-webhook-bootstrap-stateful-set   0/1     28s
+statefulset.apps/application-controller-stateful-set        0/1     31s
+statefulset.apps/kfserving-controller-manager               0/1     16s
+statefulset.apps/metacontroller                             0/1     29s
+statefulset.apps/seldon-operator-controller-manager         0/1     8s
+```
+
+
+```
+kf_test10 ››  kubectl get po -n istio-system                                                                                                                                          
+NAME                                      READY   STATUS              RESTARTS   AGE
+grafana-86f89dbd84-nb2hg                  1/1     Running             0          58s
+istio-citadel-74966f47d6-jgf7m            1/1     Running             0          58s
+istio-cleanup-secrets-1.1.6-dcc7l         0/1     ContainerCreating   0          56s
+istio-egressgateway-5c64d575bc-lr9hj      0/1     Running             0          57s
+istio-galley-784b9f6d75-m9r9s             0/1     ContainerCreating   0          57s
+istio-grafana-post-install-1.1.6-ktqtv    0/1     ContainerCreating   0          55s
+istio-ingressgateway-589ff776dd-jh2dg     0/1     Running             0          57s
+istio-pilot-677df6b6d4-r4tqb              0/2     ContainerCreating   0          57s
+istio-policy-6f74d9d95d-gss2n             0/2     ContainerCreating   0          57s
+istio-security-post-install-1.1.6-nv4c4   0/1     ContainerCreating   0          55s
+istio-sidecar-injector-866f4b98c7-dkbdw   0/1     ContainerCreating   0          56s
+istio-telemetry-549c8f9dcb-tvclr          0/2     ContainerCreating   0          56s
+istio-tracing-555cf644d-jhwhb             0/1     Running             0          56s
+kiali-7db44d6dfb-mvdtp                    0/1     ContainerCreating   0          56s
+prometheus-d44645598-65b6f                0/1     ContainerCreating   0          56s
+```
+
+# Install KubeFlow pipline 
+
+```
+URL=https://storage.googleapis.com/ml-pipeline/release/latest/kfp.tar.gz
+pip3 install "${URL}" --upgrade
+```
+Output:
+```
+Installing collected packages: tabulate, strip-hints, requests-toolbelt, kfp-server-api, kfp-pipeline-spec, docstring-parser, Deprecated, kfp
+Successfully installed Deprecated-1.2.10 docstring-parser-0.7.3 kfp-1.1.2rc1 kfp-pipeline-spec-0.1.2 kfp-server-api-1.0.4 requests-toolbelt-0.9.1 strip-hints-0.1.9 tabulate-0.8.7
+```
+```
+pipelines ›› kubectl get pods --all-namespaces                                                                                                                                0da0f802
+NAMESPACE         NAME                                                           READY   STATUS             RESTARTS   AGE
+istio-system      grafana-86f89dbd84-nb2hg                                       1/1     Running            0          28m
+istio-system      istio-citadel-74966f47d6-jgf7m                                 1/1     Running            0          28m
+istio-system      istio-cleanup-secrets-1.1.6-dcc7l                              0/1     Completed          0          28m
+istio-system      istio-egressgateway-5c64d575bc-lr9hj                           1/1     Running            0          28m
+istio-system      istio-galley-784b9f6d75-m9r9s                                  1/1     Running            0          28m
+istio-system      istio-grafana-post-install-1.1.6-ktqtv                         0/1     Completed          0          28m
+istio-system      istio-ingressgateway-589ff776dd-jh2dg                          1/1     Running            0          28m
+istio-system      istio-pilot-677df6b6d4-r4tqb                                   2/2     Running            0          28m
+istio-system      istio-policy-6f74d9d95d-gss2n                                  2/2     Running            8          28m
+istio-system      istio-security-post-install-1.1.6-nv4c4                        0/1     Completed          0          28m
+istio-system      istio-sidecar-injector-866f4b98c7-dkbdw                        1/1     Running            0          28m
+istio-system      istio-telemetry-549c8f9dcb-tvclr                               2/2     Running            8          28m
+istio-system      istio-tracing-555cf644d-jhwhb                                  1/1     Running            0          28m
+istio-system      kiali-7db44d6dfb-mvdtp                                         1/1     Running            0          28m
+istio-system      prometheus-d44645598-65b6f                                     1/1     Running            0          28m
+knative-serving   activator-5484756f7b-tksvp                                     2/2     Running            2          5m18s
+knative-serving   autoscaler-8dc957c8-md46m                                      2/2     Running            2          5m19s
+knative-serving   autoscaler-hpa-5654b69d4c-vjhsw                                1/1     Running            0          5m18s
+knative-serving   controller-66654bc6f7-c2nrg                                    0/1     Pending            0          5m17s
+knative-serving   networking-istio-557465cf96-dvwv2                              0/1     Pending            0          5m18s
+knative-serving   webhook-585767d97f-d2zc9                                       0/1     Pending            0          5m15s
+kube-system       coredns-5d4dd4b4db-txd95                                       1/1     Running            0          40m
+kube-system       etcd-minikube                                                  1/1     Running            0          39m
+kube-system       kube-apiserver-minikube                                        1/1     Running            0          39m
+kube-system       kube-controller-manager-minikube                               1/1     Running            0          39m
+kube-system       kube-proxy-qhmwk                                               1/1     Running            0          40m
+kube-system       kube-scheduler-minikube                                        1/1     Running            0          39m
+kube-system       storage-provisioner                                            1/1     Running            1          40m
+kubeflow          admission-webhook-bootstrap-stateful-set-0                     1/1     Running            0          28m
+kubeflow          admission-webhook-deployment-b7d89f4c7-xr5bl                   1/1     Running            0          25m
+kubeflow          application-controller-stateful-set-0                          1/1     Running            0          28m
+kubeflow          argo-ui-6754c76f9b-8kkwx                                       1/1     Running            0          28m
+kubeflow          centraldashboard-5578cc9569-lhlzt                              1/1     Running            0          28m
+kubeflow          jupyter-web-app-deployment-6b7d9c5fd6-wzx27                    1/1     Running            0          27m
+kubeflow          katib-controller-789d76d446-nn4ll                              1/1     Running            1          27m
+kubeflow          katib-db-75975d8dbd-w8r2g                                      1/1     Running            0          27m
+kubeflow          katib-manager-59bb84948f-5dmb5                                 1/1     Running            0          27m
+kubeflow          katib-ui-dd75bd446-pdjt8                                       1/1     Running            0          27m
+kubeflow          kfserving-controller-manager-0                                 2/2     Running            1          27m
+kubeflow          metacontroller-0                                               1/1     Running            0          28m
+kubeflow          metadata-db-7584d44b65-dztxc                                   1/1     Running            0          27m
+kubeflow          metadata-deployment-cd8f7d58f-jzltz                            1/1     Running            0          27m
+kubeflow          metadata-envoy-deployment-bff4f8b9-gs762                       1/1     Running            0          27m
+kubeflow          metadata-grpc-deployment-7cc5d84854-vq59p                      1/1     Running            0          27m
+kubeflow          metadata-ui-7c978889b5-tbk4x                                   1/1     Running            0          27m
+kubeflow          minio-764648495-kvczk                                          1/1     Running            0          27m
+kubeflow          ml-pipeline-588b64fff-xs2rx                                    1/1     Running            3          27m
+kubeflow          ml-pipeline-ml-pipeline-visualizationserver-6c7c97869d-546pr   1/1     Running            0          27m
+kubeflow          ml-pipeline-persistenceagent-79ff896578-9bvns                  1/1     Running            0          27m
+kubeflow          ml-pipeline-scheduledworkflow-7d89bb6db5-xx24f                 1/1     Running            0          27m
+kubeflow          ml-pipeline-ui-6656886579-p8tc5                                1/1     Running            0          27m
+kubeflow          ml-pipeline-viewer-controller-deployment-546bd5f545-9r8r6      1/1     Running            0          27m
+kubeflow          mysql-6c9cb88c4d-5h25j                                         1/1     Running            0          27m
+kubeflow          notebook-controller-deployment-6d594ddd6b-xrgwq                1/1     Running            0          27m
+kubeflow          profiles-deployment-67799585bd-wwmpg                           1/2     ImagePullBackOff   0          27m
+kubeflow          pytorch-operator-fdfd7985-t9824                                1/1     Running            0          27m
+kubeflow          seldon-operator-controller-manager-0                           1/1     Running            1          27m
+kubeflow          spartakus-volunteer-5888bc655-w2f66                            1/1     Running            0          27m
+kubeflow          tensorboard-5f685f9d79-clk4g                                   0/1     Pending            0          27m
+kubeflow          tf-job-operator-5dff84b966-xbn6n                               1/1     Running            0          27m
+kubeflow          workflow-controller-85c665bcb9-q6vt5                           1/1     Running            0          28m
+```
+
+```
+kubectl port-forward svc/istio-ingressgateway -n istio-system 7777:80    
+```
+Then go to `localhost:7777`
+![kf5](assets/kf5.png) 
+
+Done!!!
