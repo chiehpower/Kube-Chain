@@ -2,9 +2,7 @@
 ```
 kubectl cluster-info
 ```
-```
 
-```
 Kubernetes master is running at https://127.0.0.1:36777
 KubeDNS is running at https://127.0.0.1:36777/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 
@@ -99,7 +97,7 @@ Opening in existing browser session.
 ---
 # Try on GCP
 
-# Install gcloud tool on local
+## Install gcloud tool on local
 https://cloud.google.com/sdk/docs/quickstart
 
 (Optional) If you'd like a more streamlined screen reader experience, the gcloud command-line tool comes with an `accessibility/screen_reader` property.

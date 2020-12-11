@@ -694,3 +694,7 @@ Then go to `localhost:7777`
 ![kf5](assets/kf5.png) 
 
 Done!!!
+
+---
+
+When you wanna go back to your kubeflow if you left it, type `kubectl port-forward svc/istio-ingressgateway -n istio-system 7777:80` again, and login this `localhost:7777` link.
