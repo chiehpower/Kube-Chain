@@ -1,3 +1,4 @@
+My environment is Ubuntu 20.04.
 # Try to use `microk8s` to create the k8s
 
 Check the version:
@@ -234,3 +235,277 @@ To tear down Kubeflow and associated infrastructure, run:
 
     microk8s disable kubeflow
 ```
+
+
+This one is optional.
+```
+$ microk8s enable gpu
+```
+
+Check with the kubectl
+
+```
+ microk8s.kubectl get po -n kubeflow 
+NAME                                           READY   STATUS    RESTARTS   AGE
+admission-webhook-5749db547f-7djp6             1/1     Running   2          100m
+admission-webhook-operator-0                   1/1     Running   2          100m
+argo-controller-6fd6865897-zzk77               1/1     Running   2          95m
+argo-controller-operator-0                     1/1     Running   2          99m
+argo-ui-6f9fc485f-hxtzb                        1/1     Running   2          99m
+argo-ui-operator-0                             1/1     Running   2          99m
+dex-auth-845b474467-z8ns9                      2/2     Running   9          93m
+dex-auth-operator-0                            1/1     Running   2          99m
+istio-ingressgateway-585b4997ff-wx2tb          1/1     Running   2          93m
+istio-ingressgateway-operator-0                1/1     Running   2          99m
+istio-pilot-6fb7678498-mg4b5                   1/1     Running   2          98m
+istio-pilot-operator-0                         1/1     Running   2          98m
+jupyter-controller-78b6b6f97-qmknm             1/1     Running   2          98m
+jupyter-controller-operator-0                  1/1     Running   2          98m
+jupyter-web-854776b5b-xfv76                    1/1     Running   2          98m
+jupyter-web-operator-0                         1/1     Running   2          98m
+katib-controller-7599cd86f9-bmq9q              1/1     Running   2          97m
+katib-controller-operator-0                    1/1     Running   2          97m
+katib-db-0                                     1/1     Running   2          97m
+katib-db-operator-0                            1/1     Running   2          97m
+katib-manager-7b7b4f8547-9jlql                 1/1     Running   2          97m
+katib-manager-operator-0                       1/1     Running   2          97m
+katib-ui-55966dfd78-nthd8                      1/1     Running   2          97m
+katib-ui-operator-0                            1/1     Running   2          97m
+kubeflow-dashboard-58b859f69b-lv5ll            1/1     Running   2          97m
+kubeflow-dashboard-operator-0                  1/1     Running   2          97m
+kubeflow-profiles-7dcd6997ff-n5jpx             2/2     Running   4          97m
+kubeflow-profiles-operator-0                   1/1     Running   2          98m
+metacontroller-6b4cd56645-hd7gd                1/1     Running   2          96m
+metacontroller-operator-0                      1/1     Running   2          96m
+metadata-api-757b78f955-bxq5m                  1/1     Running   4          96m
+metadata-api-operator-0                        1/1     Running   2          96m
+metadata-db-0                                  1/1     Running   2          96m
+metadata-db-operator-0                         1/1     Running   2          96m
+metadata-envoy-5d79788846-hhjmq                1/1     Running   2          96m
+metadata-envoy-operator-0                      1/1     Running   2          96m
+metadata-grpc-5cfc4877c7-c5wqz                 1/1     Running   5          96m
+metadata-grpc-operator-0                       1/1     Running   2          96m
+metadata-ui-7f86857955-tv7dj                   1/1     Running   2          96m
+metadata-ui-operator-0                         1/1     Running   2          96m
+minio-0                                        1/1     Running   2          95m
+minio-operator-0                               1/1     Running   2          95m
+modeloperator-7459469cdd-tzkbc                 1/1     Running   2          100m
+oidc-gatekeeper-648d7644d7-mx6mc               2/2     Running   4          93m
+oidc-gatekeeper-operator-0                     1/1     Running   2          95m
+pipelines-api-76d455df4c-sx4bl                 1/1     Running   4          93m
+pipelines-api-operator-0                       1/1     Running   2          94m
+pipelines-db-0                                 1/1     Running   2          94m
+pipelines-db-operator-0                        1/1     Running   2          95m
+pipelines-persistence-569fc867c6-bl4lx         1/1     Running   2          94m
+pipelines-persistence-operator-0               1/1     Running   2          94m
+pipelines-scheduledworkflow-749bbdcfdd-dx8fq   1/1     Running   2          94m
+pipelines-scheduledworkflow-operator-0         1/1     Running   2          94m
+pipelines-ui-5ccbcc74cc-57kgw                  1/1     Running   2          94m
+pipelines-ui-operator-0                        1/1     Running   2          94m
+pipelines-viewer-f57579f47-hqf8v               1/1     Running   2          94m
+pipelines-viewer-operator-0                    1/1     Running   2          94m
+pipelines-visualization-6bf774fb68-tg6bv       1/1     Running   2          95m
+pipelines-visualization-operator-0             1/1     Running   2          95m
+pytorch-operator-7b45bb58d4-fzgcf              1/1     Running   3          95m
+pytorch-operator-operator-0                    1/1     Running   2          95m
+seldon-core-56bbd6fc9b-d8qnv                   1/1     Running   3          95m
+seldon-core-operator-0                         1/1     Running   2          95m
+tf-job-operator-bbb567995-4k6r9                1/1     Running   3          94m
+tf-job-operator-operator-0                     1/1     Running   2          94m
+```
+
+
+---
+# Start to practice k8s with microk8s
+
+> Followed the tutorial steps from [[Day5]在Minikube上跑起你的Docker Containers-Pod & kubectl常用指令](https://ithelp.ithome.com.tw/articles/10193232)
+
+A mojority of concepts and steps are similar, but the most different is that I used the `microk8s` instead of using `minikube` in this practice.
+Therefore, there are few commands which are different from that tutorials.
+
+**The purpose is to build an image and create a container on k8s.**
+
+Here are some conclusions about basic k8s usages.
+The overview workflow is :
+    1. Create a pod by a yaml file (This `yaml` file includes the basic your container information setting.)
+    2. Get pods to check the status of pods
+    3. If your pod get stuck on `ContainerCreating`, use `kubectl describe` to check the status and detail info.
+    4. Use the pod by `kubectl port-forward` or `kubectl expose pod` with `kubectl get services` to check how many services.
+
+Notes:
+    1. The `spec.container.image` in the `yaml` basically is the path of Docker Hub registry.
+    2. The pod name cannot use `_` but it can accept `-`.
+
+
+### Build a ymal file
+
+Create a yaml file named : `my_app_1.yaml`
+
+```
+$ cat my_app_1.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+  labels:
+    app: webserver
+spec:
+  containers:
+  - name: pod-demo
+    image: zxcvbnius/docker-demo
+    ports:
+    - containerPort: 3000
+
+$ microk8s.kubectl create -f my_app_1.yaml
+pod/my-pod created
+```
+If you are not sure your apiVersion version, you can check it by `microk8s.config`
+
+It will take some time on creating the pod. You can also check on the dashboard by `microk8s dashboard-proxy`.
+
+### Check the pod status:
+
+```
+$ microk8s.kubectl get pod                                                                                                 solomon@10
+NAME     READY   STATUS    RESTARTS   AGE
+my-pod   1/1     Running   0          6m
+```
+
+Or you can also use `describe` to check more detail info.
+```
+$ microk8s.kubectl describe pod my-pod
+
+Name:         my-pod
+Namespace:    default
+Priority:     0
+Node:         10.1./10.1.
+Start Time:   - 
+Labels:       app=webserver
+Annotations:  <none>
+Status:       Running
+IP:           10.1.50.45
+IPs:
+  IP:  10.1.50.45
+Containers:
+  pod-demo:
+    Container ID:   containerd://54ac1ad509a68d
+    Image:          zxcvbnius/docker-demo
+    Image ID:       docker.io/zxcvbnius/docker-demo@sha256:a3c6b
+    Port:           3000/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Thu, 29 Apr 2021 10:21:20 +0800
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-m4qck (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-m4qck:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-m4qck
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  6m44s  default-scheduler  Successfully assigned default/my-pod to 10.1.
+  Normal  Pulling    6m44s  kubelet            Pulling image "zxcvbnius/docker-demo"
+  Normal  Pulled     27s    kubelet            Successfully pulled image "zxcvbnius/docker-demo"
+  Normal  Created    27s    kubelet            Created container pod-demo
+  Normal  Started    26s    kubelet            Started container pod-demo
+-------------------------------------------------------------------------------------------
+```
+
+Reference:
+- [Kubernetes stuck on ContainerCreating](https://serverfault.com/questions/728727/kubernetes-stuck-on-containercreating)
+### Visit our pod
+
+1. Forward the port number from pod to host
+    ```
+    $ microk8s.kubectl port-forward my-pod 8888:3000
+    Forwarding from 127.0.0.1:8888 -> 3000
+    Forwarding from [::1]:8888 -> 3000
+    ```
+
+    This one can let your host 8888 port number to connect to 3000 port number of the pod. 
+
+    So open our browser to go to this url `http://127.0.0.1:8888` and then we can see the words of hello world!
+    
+    However, this one you have to keep your terminal. If you close it, then you are not able to access this link. 
+2. Create a service
+    We use `microk8s.expose` to mapping the port of pod and port of k8s cluster. 
+    ```
+    $ microk8s.kubectl expose pod my-pod --type=NodePort --name=my-pod-service
+    service/my-pod-service exposed
+    ```
+    Check our services
+    ```
+    $ microk8s.kubectl get services
+
+    NAME             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+    kubernetes       ClusterIP   10.152.183.1     <none>        443/TCP          139m
+    my-pod-service   NodePort    10.152.183.205   <none>        3000:32516/TCP   2m7s
+    ```
+
+    Then we can check this link `http://10.152.183.205:3000/` on browser.
+
+3. We can add a label for this pod.
+    ```
+    $ microk8s.kubectl get pods  --show-labels 
+    NAME     READY   STATUS    RESTARTS   AGE   LABELS
+    my-pod   1/1     Running   0          67m   app=webserver
+    
+    $ microk8s.kubectl label pods my-pod version=latest 
+    pod/my-pod labeled
+
+    $ microk8s.kubectl get pods  --show-labels
+    NAME     READY   STATUS    RESTARTS   AGE   LABELS
+    my-pod   1/1     Running   0          69m   app=webserver,version=latest
+    ```
+4. Use another pod to check this pod.
+   First of all, we need to install curl tool. Then use `curl` to check it.
+    ```
+    $ microk8s.kubectl run -i --tty alpine --image=alpine --restart=Never -- sh 
+    If you don't see a command prompt, try pressing enter.
+    / # apk add --no-cache curl
+    fetch https://dl-cdn.alpinelinux.org/alpine/v3.13/main/x86_64/APKINDEX.tar.gz
+    fetch https://dl-cdn.alpinelinux.org/alpine/v3.13/community/x86_64/APKINDEX.tar.gz
+    (1/5) Installing ca-certificates (20191127-r5)
+    (2/5) Installing brotli-libs (1.0.9-r3)
+    (3/5) Installing nghttp2-libs (1.42.0-r1)
+    (4/5) Installing libcurl (7.76.1-r0)
+    (5/5) Installing curl (7.76.1-r0)
+    Executing busybox-1.32.1-r6.trigger
+    Executing ca-certificates-20191127-r5.trigger
+    OK: 8 MiB in 19 packages
+    / # curl http://10.1.50.45:3000
+    Hello World!/ # 
+    ```
+    Then we can exit, and check current pods.
+    ```
+    $ microk8s.kubectl get pods
+    NAME     READY   STATUS      RESTARTS   AGE
+    alpine   0/1     Completed   0          5m23s
+    my-pod   1/1     Running     0          77m
+    ```
+
+---
+Here is a list of some useful commands for kubectl.
+
+1. get pods
+2. describe
+3. expose 
+4. port-forward
+5. attach
+6. exec
+7. label

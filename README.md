@@ -1,7 +1,11 @@
 # Kube-Chain
-This repo will record about kube-chain including kubernetes, kubeflow, and so on.
+This repo will record some notes and experiments about kube-chain tools including kubernetes, kubeflow, kfserving and so on.
 
-My environment is Ubuntu 18.04.
+**The purpose is to understand how to use k8s, and the final goal is to deploy kubeflow and successfully implement MLOps.**
+
+*The notes were quite messy.*
+
+>My environment is Ubuntu 18.04.
 
 # Install Kubernetes
 
@@ -90,4 +94,32 @@ Kubernetes master is running at https://127.0.0.1:36777
 KubeDNS is running at https://127.0.0.1:36777/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+```
+
+# Deploy the NVIDIA device plugin
+
+```
+Command:
+kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0.0-beta4/nvidia-device-plugin.yml
+
+Output:
+daemonset.apps/nvidia-device-plugin-daemonset created
+```
+
+---
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cuda-vector-add
+spec:
+  restartPolicy: OnFailure
+  containers:
+    - name: cuda-vector-add
+      # https://github.com/kubernetes/kubernetes/blob/v1.7.11/test/images/nvidia-cuda/Dockerfile
+      image: "k8s.gcr.io/cuda-vector-add:v0.1"
+      resources:
+        limits:
+          nvidia.com/gpu: 1 # requesting 1 GPU
 ```
