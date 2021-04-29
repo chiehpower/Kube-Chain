@@ -509,3 +509,27 @@ Here is a list of some useful commands for kubectl.
 5. attach
 6. exec
 7. label
+
+
+---
+# Troubleshooting
+
+When we enalbe kubeflow:
+```
+$ microk8s enable kubeflow  
+Enabling dns...
+Enabling storage...
+Enabling ingress...
+Enabling metallb:10.64.140.43-10.64.140.49...
+Waiting for other addons to finish initializing...
+Addon setup complete. Checking connectivity...
+
+Couldn't contact api.jujucharms.com from within the Kubernetes cluster
+Please check your network connectivity before enabling Kubeflow.
+
+See here for troubleshooting help:
+
+    https://microk8s.io/docs/troubleshooting#heading--common-issues
+Failed to enable kubeflow
+--------------------------------
+```
