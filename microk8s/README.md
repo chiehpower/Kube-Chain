@@ -430,10 +430,10 @@ If you are not sure your apiVersion version, you can check it by `microk8s.confi
 
 It will take some time on creating the pod. You can also check on the dashboard by `microk8s dashboard-proxy`.
 
-### Check the pod status:
+### Check the pod status
 
 ```
-$ microk8s.kubectl get pod                                                                                                 solomon@10
+$ microk8s.kubectl get pod  
 NAME     READY   STATUS    RESTARTS   AGE
 my-pod   1/1     Running   0          6m
 ```
@@ -601,6 +601,8 @@ See here for troubleshooting help:
 Failed to enable kubeflow
 --------------------------------
 ```
+
+Change the microk8s version.
 
 2. When microk8s is not running, microk8s.inspect is showing no error 
 
