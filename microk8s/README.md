@@ -3,6 +3,9 @@ My environment is Ubuntu 20.04.
 
 Check the version:
 
+<p>
+<details><summary> more </summary>
+
 ```
 latest/stable     snap install --stable microk8s
 latest/candidate  snap install --candidate microk8s
@@ -45,6 +48,29 @@ latest/beta       snap install --beta microk8s
 1.10/beta         snap install --channel=1.10/beta microk8s
 ```
 
+</details>
+</p>
+
+# Use the latest version
+```
+sudo snap install microk8s --channel=latest/edge --classic
+sudo snap install juju --classic
+microk8s enable dns dashboard storage gpu registry istio
+microk8s enable kubeflow
+
+```
+I don't know whether it can pass the Bootstrapping stage because of installing juju first or not, but the results seem good!
+![assets](assets/latest.png)
+
+Check the dashboard!
+link: `http://10.64.140.44.nip.io/`
+
+![assets](assets/home.png)
+![assets](assets/notebook.png)
+![assets](assets/pipeline.png)
+
+---
+# Use the v1.18
 Choose v1.18 to install.
 ```
 $ sudo snap install microk8s --channel=1.18 --classic
@@ -311,6 +337,9 @@ default              gpu-operator-64df558567-qfdvd                              
 
 Check with the kubectl
 
+<p>
+<details><summary> more </summary>
+
 ```
  microk8s.kubectl get po -n kubeflow 
 NAME                                           READY   STATUS    RESTARTS   AGE
@@ -381,6 +410,8 @@ tf-job-operator-bbb567995-4k6r9                1/1     Running   3          94m
 tf-job-operator-operator-0                     1/1     Running   2          94m
 ```
 
+</details>
+</p>
 
 ---
 # Start to practice k8s with microk8s
@@ -599,12 +630,27 @@ See here for troubleshooting help:
 
     https://microk8s.io/docs/troubleshooting#heading--common-issues
 Failed to enable kubeflow
---------------------------------
 ```
 
-Change the microk8s version.
+Solution:
+    - Change the microk8s version.
+        - You can try to install juju first: `sudo snap install juju --classic`
 
 2. When microk8s is not running, microk8s.inspect is showing no error 
 
    Check the hostname, and changed the hostname with Latin lowercase characters. Check the issue [here](https://github.com/ubuntu/microk8s/issues/2224)
 
+---
+# Reference
+
+In fact, there are some problems about setup kubeflow and microk8s during enabling relevant packages.
+
+Here are some useful discussions about these topics.
+- https://github.com/ubuntu/microk8s/issues/2253
+- https://github.com/kubeflow/kubeflow/issues/5429
+- https://gist.github.com/etheleon/80414516c7fbc7147a5718b9897b1518
+- https://github.com/ubuntu/microk8s/issues/1764
+- https://github.com/kubeflow/kubeflow/issues/5407
+- https://juju.is/docs/olm/get-started-on-a-localhost
+- https://github.com/ubuntu/microk8s/issues/1396
+- https://github.com/ubuntu/microk8s/issues/1439
