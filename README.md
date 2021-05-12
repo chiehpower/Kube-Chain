@@ -1,125 +1,36 @@
-# Kube-Chain
-This repo will record some notes and experiments about kube-chain tools including kubernetes, kubeflow, kfserving and so on.
+# KuBeChain
+[![](https://img.shields.io/badge/Status-Updating-blue)](./)
 
-**The purpose is to understand how to use k8s, and the final goal is to deploy kubeflow and successfully implement MLOps.**
+KuBeChain recorded some my notes and experiments about kube-chain tools including kubernetes, kubeflow, kfserving and so on.
 
-*The notes were quite messy.*
+**The purpose is to understand how to install the Kubernetes, and the final goal is to deploy the kubeflow and successfully implement MLOps.**
 
->My environment is Ubuntu 18.04.
+*The notes were a little bit messy until I fully implemented it.*
 
-# Install Kubernetes
+>My testing environments are Ubuntu v18.04 and v20.04.
 
-## Install kubectl
+## Introduction
 
-- Check here : [Install and Set Up kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+Let me briefly explain for someone who wanna learn and try kubernetes and their chain.
 
-First, we are going to install `kubectl` which is Kubernetes command-line tool and it allows you to run commands against Kubernetes clusters.
+Basically there are some ways to create a cluster via different tools or platforms that it fully depends on your purpose.
 
-Install kubectl binary with curl on Linux 
+**Cluster is Cluster which can be created by many tools.**
 
-```
-curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" 
-chmod +x ./kubectl
-sudo mv ./kubectl /usr/local/bin/kubectl
-kubectl version --client
-```
+When I tried to install k8s at the first time, I just thought "ok it should be only one tool to be able to install k8s.", but obviously it was not. It is independent. For example, we can imagine that k8s is like a city, and we can take a bus or drive a car to there. There are some transports to bring us to there, so that means we have many choices to achieve k8s deployment. However, for the beginner, it will make a little bit confused because we do not know which one is more suitable for us to apply and practice. Each tool has its commands and its behavior. For instance, if you choose the car, you have to understand how to drive the car and how to control it, right? So it is one of difficult levels for beginners to familiarize and understand k8s behavior. 
 
-My output:
->Client Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.2", GitCommit:"f5743093fd1c663cb0cbc89748f730662345d44d", GitTreeState:"clean", BuildDate:"2020-09-16T13:41:02Z", GoVersion:"go1.15", Compiler:"gc", Platform:"linux/amd64"}
+> Tools : microk8s, minikube, some clould platforms (e.g., AWS, GCP, Azure), etc
+>
+> The situations can be categorized such as single node (single machine), local or cloud service, container or VM. 
 
-## Install kubeadm kubelet kubectl
+Creating a cluster is the initial step. Sequentially, there is a specific tool to control k8s, kubectl. We will use the kubectl tool to control the settings of k8s. In that part, I highly recommend you have to get some experience on docker. Otherwise, it will be too hard to handle.
 
-```
-# (Cannot work) sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
-sudo apt-get install kubeadm kubelet kubectl -y
-```
+> Prerequisites: docker background knowledge
+>
+> Tools : kubectl
 
-Common tools of k8s:
-Generally, k8s has 3 tools that can be used on the master node:
+Next part, it is about the deploying kubeflow. As we know that the kubeflow will connect to a lot of components, mostly it would get some troubles on enabling / applying the kubeflow entire compoments. 
 
-1. kubectl
-2. kubeadm
-3. kubelet
 
-Check the k8s version:
-```
-kubeadm version
-```
 
-Output:
-```
-kubeadm version: &version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.2", GitCommit:"f5743093fd1c663cb0cbc89748f730662345d44d", GitTreeState:"clean", BuildDate:"2020-09-16T13:38:53Z", GoVersion:"go1.15", Compiler:"gc", Platform:"linux/amd64"}
-```
-## Install k8s
-
-From `https://dl.k8s.io/v1.19.0/kubernetes.tar.gz`
-
-extract it. 
-
-## Install Kind
-From `https://kind.sigs.k8s.io/docs/user/quick-start/`
-
-```
-curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
-chmod +x ./kind
-mv ./kind /usr/bin/kind 
-```
-
-k8s has 2 servers. One is client, and another one is server.
-
-## Create a cluster
-
-```
-$ kind create cluster
-Creating cluster "kind" ...
- ✓ Ensuring node image (kindest/node:v1.19.1) 🖼 
- ✓ Preparing nodes 📦  
- ✓ Writing configuration 📜 
- ✓ Starting control-plane 🕹️ 
- ✓ Installing CNI 🔌 
- ✓ Installing StorageClass 💾 
-Set kubectl context to "kind-kind"
-You can now use your cluster with:
-
-kubectl cluster-info --context kind-kind
-
-Not sure what to do next? 😅  Check out https://kind.sigs.k8s.io/docs/user/quick-start/
-```
-
-Let's check the cluster info.
-```
-$ kubectl cluster-info --context kind-kind
-
-Kubernetes master is running at https://127.0.0.1:36777
-KubeDNS is running at https://127.0.0.1:36777/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
-
-To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
-```
-
-# Deploy the NVIDIA device plugin
-
-```
-Command:
-kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/1.0.0-beta4/nvidia-device-plugin.yml
-
-Output:
-daemonset.apps/nvidia-device-plugin-daemonset created
-```
-
----
-
-```
-apiVersion: v1
-kind: Pod
-metadata:
-  name: cuda-vector-add
-spec:
-  restartPolicy: OnFailure
-  containers:
-    - name: cuda-vector-add
-      # https://github.com/kubernetes/kubernetes/blob/v1.7.11/test/images/nvidia-cuda/Dockerfile
-      image: "k8s.gcr.io/cuda-vector-add:v0.1"
-      resources:
-        limits:
-          nvidia.com/gpu: 1 # requesting 1 GPU
-```
+Update soon...
