@@ -3,6 +3,9 @@ My environment is Ubuntu 20.04.
 
 Check the version:
 
+<p>
+<details><summary> more </summary>
+
 ```
 latest/stable     snap install --stable microk8s
 latest/candidate  snap install --candidate microk8s
@@ -45,6 +48,29 @@ latest/beta       snap install --beta microk8s
 1.10/beta         snap install --channel=1.10/beta microk8s
 ```
 
+</details>
+</p>
+
+# Use the latest version
+```
+sudo snap install microk8s --channel=latest/edge --classic
+sudo snap install juju --classic
+microk8s enable dns dashboard storage gpu registry istio
+microk8s enable kubeflow
+
+```
+I don't know whether it can pass the Bootstrapping stage because of installing juju first or not, but the results seem good!
+![assets](assets/latest.png)
+
+Check the dashboard!
+link: `http://10.64.140.44.nip.io/`
+
+![assets](assets/home.png)
+![assets](assets/notebook.png)
+![assets](assets/pipeline.png)
+
+---
+# Use the v1.18
 Choose v1.18 to install.
 ```
 $ sudo snap install microk8s --channel=1.18 --classic
@@ -240,9 +266,79 @@ To tear down Kubeflow and associated infrastructure, run:
 This one is optional.
 ```
 $ microk8s enable gpu
+
+Enabling NVIDIA GPU
+Enabling DNS
+Applying manifest
+serviceaccount/coredns created
+configmap/coredns created
+deployment.apps/coredns created
+service/kube-dns created
+clusterrole.rbac.authorization.k8s.io/coredns created
+clusterrolebinding.rbac.authorization.k8s.io/coredns created
+Restarting kubelet
+DNS is enabled
+Enabling Helm 3
+Fetching helm version v3.5.0.
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 11.7M  100 11.7M    0     0  1885k      0  0:00:06  0:00:06 --:--:-- 2468k
+Helm 3 is enabled
+Installing NVIDIA Operator
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /var/snap/microk8s/2128/credentials/client.config
+"nvidia" has been added to your repositories
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /var/snap/microk8s/2128/credentials/client.config
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "nvidia" chart repository
+Update Complete. ⎈Happy Helming!⎈
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /var/snap/microk8s/2128/credentials/client.config
+NAME: gpu-operator
+LAST DEPLOYED: Tue May  4 09:32:07 2021
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NVIDIA is enabled
 ```
 
+Then we can check here to find the key words about `gpu`
+
+```
+> microk8s.kubectl get pods -A
+NAMESPACE            NAME                                                         READY   STATUS              RESTARTS   AGE
+default              gpu-operator-node-feature-discovery-worker-vvlmn             0/1     ContainerCreating   0          48s
+default              gpu-operator-node-feature-discovery-master-dcf999dc8-7kr6b   0/1     ContainerCreating   0          48s
+kube-system          calico-node-gnpmn                                            1/1     Running             0          3m37s
+kube-system          coredns-7f9c69c78c-9zcr7                                     1/1     Running             0          79s
+kube-system          calico-kube-controllers-f7868dd95-pt58p                      1/1     Running             0          3m39s
+container-registry   registry-9b57d9df8-znbn2                                     0/1     Pending             0          21s
+istio-system         istio-grafana-post-install-1.5.1-fs6dx                       0/1     ContainerCreating   0          22s
+istio-system         istio-security-post-install-1.5.1-zg9x8                      0/1     ContainerCreating   0          22s
+istio-system         istio-pilot-6976cdf765-rwl72                                 0/2     ContainerCreating   0          21s
+istio-system         grafana-74488d57b4-fsjb9                                     0/1     ContainerCreating   0          21s
+istio-system         istio-egressgateway-674898c6-25tdp                           0/1     ContainerCreating   0          21s
+istio-system         istio-policy-56698c6987-2m7hk                                0/2     ContainerCreating   0          21s
+istio-system         prometheus-95dd89f5b-5dsqb                                   0/1     ContainerCreating   0          21s
+istio-system         istio-ingressgateway-5ff49854cc-kvrhm                        0/1     ContainerCreating   0          21s
+istio-system         istio-citadel-67658cf6c-mdhsv                                0/1     ContainerCreating   0          21s
+kube-system          kubernetes-dashboard-85fd7f45cb-xwjdw                        0/1     ContainerCreating   0          20s
+istio-system         kiali-75b58b6fd8-zpj8z                                       0/1     ContainerCreating   0          21s
+istio-system         istio-tracing-c69cb5cf5-82hc4                                0/1     ContainerCreating   0          20s
+istio-system         istio-galley-6fb8c7b586-9c58k                                0/1     ContainerCreating   0          21s
+istio-system         istio-telemetry-6f4556487d-s6knj                             0/2     ContainerCreating   0          21s
+istio-system         istio-sidecar-injector-69f7fcc574-mvsqn                      0/1     ContainerCreating   0          20s
+kube-system          hostpath-provisioner-5c65fbdb4f-x9h42                        0/1     ContainerCreating   0          21s
+kube-system          dashboard-metrics-scraper-78d7698477-knfkj                   0/1     ContainerCreating   0          21s
+kube-system          metrics-server-8bbfb4bdb-gj7f4                               1/1     Running             0          48s
+default              gpu-operator-64df558567-qfdvd                                1/1     Running             0          48s
+```
+
+---
+
 Check with the kubectl
+
+<p>
+<details><summary> more </summary>
 
 ```
  microk8s.kubectl get po -n kubeflow 
@@ -314,6 +410,8 @@ tf-job-operator-bbb567995-4k6r9                1/1     Running   3          94m
 tf-job-operator-operator-0                     1/1     Running   2          94m
 ```
 
+</details>
+</p>
 
 ---
 # Start to practice k8s with microk8s
@@ -363,10 +461,10 @@ If you are not sure your apiVersion version, you can check it by `microk8s.confi
 
 It will take some time on creating the pod. You can also check on the dashboard by `microk8s dashboard-proxy`.
 
-### Check the pod status:
+### Check the pod status
 
 ```
-$ microk8s.kubectl get pod                                                                                                 solomon@10
+$ microk8s.kubectl get pod  
 NAME     READY   STATUS    RESTARTS   AGE
 my-pod   1/1     Running   0          6m
 ```
@@ -514,7 +612,8 @@ Here is a list of some useful commands for kubectl.
 ---
 # Troubleshooting
 
-When we enalbe kubeflow:
+1. When we enalbe kubeflow:
+
 ```
 $ microk8s enable kubeflow  
 Enabling dns...
@@ -531,5 +630,27 @@ See here for troubleshooting help:
 
     https://microk8s.io/docs/troubleshooting#heading--common-issues
 Failed to enable kubeflow
---------------------------------
 ```
+
+Solution:
+    - Change the microk8s version.
+        - You can try to install juju first: `sudo snap install juju --classic`
+
+2. When microk8s is not running, microk8s.inspect is showing no error 
+
+   Check the hostname, and changed the hostname with Latin lowercase characters. Check the issue [here](https://github.com/ubuntu/microk8s/issues/2224)
+
+---
+# Reference
+
+In fact, there are some problems about setup kubeflow and microk8s during enabling relevant packages.
+
+Here are some useful discussions about these topics.
+- https://github.com/ubuntu/microk8s/issues/2253
+- https://github.com/kubeflow/kubeflow/issues/5429
+- https://gist.github.com/etheleon/80414516c7fbc7147a5718b9897b1518
+- https://github.com/ubuntu/microk8s/issues/1764
+- https://github.com/kubeflow/kubeflow/issues/5407
+- https://juju.is/docs/olm/get-started-on-a-localhost
+- https://github.com/ubuntu/microk8s/issues/1396
+- https://github.com/ubuntu/microk8s/issues/1439
